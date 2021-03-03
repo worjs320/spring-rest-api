@@ -1,4 +1,4 @@
-package com.rest.api;
+package com.rest.api.controller;
 
 import lombok.Getter;
 import lombok.Setter;
