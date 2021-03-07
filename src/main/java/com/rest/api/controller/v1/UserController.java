@@ -29,7 +29,8 @@ public class UserController {
 
     @ApiOperation(value = "회원 단건 조회", notes = "userId로 회원 조회")
     @GetMapping(value = "/user/{seq}")
-    public SingleResult<User> findUserById(@ApiParam(value = "회원 번호", required = true) @PathVariable long seq) {
+    public SingleResult<User> findUserById(@ApiParam(value = "회원 번호", required = true) @PathVariable long seq,
+                                           @ApiParam(value = "언어", defaultValue = "ko") @RequestParam String lang) {
         return responseService.getSingleResult(userJpaRepo.findById(seq).orElseThrow(CUserNotFoundException::new));
     }
 

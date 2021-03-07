@@ -12,3 +12,6 @@ spring:
     database-platform: org.hibernate.dialect.H2Dialect
     properties.hibernate.hbm2ddl.auto: update
     showSql: true
+  messages:
+    basename: i18/exception
+    encoding: UTF-8
