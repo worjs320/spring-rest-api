@@ -15,3 +15,5 @@ spring:
   messages:
     basename: i18/exception
     encoding: UTF-8
+  jwt:
+    secret: test-key
