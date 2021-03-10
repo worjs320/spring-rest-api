@@ -1,4 +1,4 @@
-package com.rest.api.config;
+package com.rest.api.config.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
