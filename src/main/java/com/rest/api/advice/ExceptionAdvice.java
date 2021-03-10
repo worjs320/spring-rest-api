@@ -1,5 +1,6 @@
 package com.rest.api.advice;
 
+import com.rest.api.advice.exception.CAuthenticationEntryPointException;
 import com.rest.api.advice.exception.CEmailSigninFailedException;
 import com.rest.api.advice.exception.CUserNotFoundException;
 import com.rest.api.model.CommonResult;
@@ -39,6 +40,11 @@ public class ExceptionAdvice {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     protected CommonResult emailSigninFailed(HttpServletRequest request, CEmailSigninFailedException e) {
         return responseService.getFailResult(Integer.valueOf(getMessage("emailSigninFailed.code")), getMessage("emailSigninFailed.msg"));
+    }
+
+    @ExceptionHandler(CAuthenticationEntryPointException.class)
+    public CommonResult authenticationEntryPointException(HttpServletRequest request, CAuthenticationEntryPointException e) {
+        return responseService.getFailResult(Integer.valueOf(getMessage("entryPointException.code")), getMessage("entryPointException.msg"));
     }
 
     // code정보에 해당하는 메시지를 조회합니다.
