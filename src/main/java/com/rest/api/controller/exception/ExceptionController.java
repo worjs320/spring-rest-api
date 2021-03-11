@@ -18,4 +18,9 @@ public class ExceptionController {
     public CommonResult entrypointException() {
         throw new CAuthenticationEntryPointException();
     }
+
+    @GetMapping(value = "/accessdenied")
+    public CommonResult accessDeniedException() {
+        throw new CAuthenticationEntryPointException();
+    }
 }

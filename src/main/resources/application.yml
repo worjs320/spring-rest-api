@@ -13,7 +13,7 @@ spring:
     properties.hibernate.hbm2ddl.auto: update
     showSql: true
   messages:
-    basename: i18/exception
+    basename: i18n/exception
     encoding: UTF-8
   jwt:
     secret: test-key

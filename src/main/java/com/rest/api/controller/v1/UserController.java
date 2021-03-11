@@ -25,7 +25,7 @@ public class UserController {
             @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = true, dataType = "String", paramType = "header")
     })
     @ApiOperation(value = "회원 조회", notes = "모든 회원을 조회한다")
-    @GetMapping(value = "/user")
+    @GetMapping(value = "/users")
     public ListResult<User> findAllUser() {
         return responseService.getListResult(userJpaRepo.findAll());
     }

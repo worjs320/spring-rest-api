@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.servlet.http.HttpServletRequest;
+import java.nio.file.AccessDeniedException;
 
 @RequiredArgsConstructor
 @RestControllerAdvice
@@ -45,6 +46,11 @@ public class ExceptionAdvice {
     @ExceptionHandler(CAuthenticationEntryPointException.class)
     public CommonResult authenticationEntryPointException(HttpServletRequest request, CAuthenticationEntryPointException e) {
         return responseService.getFailResult(Integer.valueOf(getMessage("entryPointException.code")), getMessage("entryPointException.msg"));
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public CommonResult accessDeniedException(HttpServletRequest request,  AccessDeniedException e) {
+        return responseService.getFailResult(Integer.valueOf(getMessage("accessDenied.code")), getMessage("accessDenied.msg"));
     }
 
     // code정보에 해당하는 메시지를 조회합니다.
