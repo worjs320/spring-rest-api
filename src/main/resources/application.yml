@@ -17,3 +17,13 @@ spring:
     encoding: UTF-8
   jwt:
     secret: test-key
+  social:
+    kakao:
+      client_id: a8200fe8c9a0689f9c649c77d1f35782
+      redirect: /social/login/kakao
+      url:
+        login:
+        token:
+        profile:
+  url:
+    base: http://localhost:8080
