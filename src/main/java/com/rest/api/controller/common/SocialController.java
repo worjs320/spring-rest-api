@@ -2,6 +2,7 @@ package com.rest.api.controller.common;
 
 
 import com.google.gson.Gson;
+import com.rest.api.service.social.KakaoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
@@ -20,7 +21,7 @@ public class SocialController {
     private final Environment env;
     private final RestTemplate restTemplate;
     private final Gson gson;
-//    private final KakaoService kakaoService;
+    private final KakaoService kakaoService;
 
     @Value("${spring.url.base}")
     private String baseUrl;
@@ -36,8 +37,6 @@ public class SocialController {
      */
     @GetMapping
     public ModelAndView socialLogin(ModelAndView mav) {
-        System.out.println("TTTTTTTTTT");
-
         StringBuilder loginUrl = new StringBuilder()
                 .append(env.getProperty("spring.social.kakao.url.login"))
                 .append("?client_id=").append(kakaoClientId)
@@ -54,8 +53,7 @@ public class SocialController {
      */
     @GetMapping(value = "/kakao")
     public ModelAndView redirectKakao(ModelAndView mav, @RequestParam String code) {
-        System.out.println(code);
-        mav.addObject("authInfo", code);
+        mav.addObject("authInfo", kakaoService.getKakaoTokenInfo(code));
         mav.setViewName("social/redirectKakao");
         return mav;
     }
