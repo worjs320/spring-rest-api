@@ -13,7 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-@Api(tags = {"1. User"})
+@Api(tags = {"2. User"})
 @RequiredArgsConstructor
 @RestController
 @RequestMapping(value = "/v1")
