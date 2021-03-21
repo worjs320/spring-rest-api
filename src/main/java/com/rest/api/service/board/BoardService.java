@@ -4,6 +4,7 @@ import com.rest.api.advice.exception.CForbiddenWordException;
 import com.rest.api.advice.exception.CNotOwnerException;
 import com.rest.api.advice.exception.CResourceNotExistException;
 import com.rest.api.advice.exception.CUserNotFoundException;
+import com.rest.api.annotation.ForbiddenWordCheck;
 import com.rest.api.common.CacheKey;
 import com.rest.api.entity.User;
 import com.rest.api.entity.board.Board;
@@ -13,6 +14,7 @@ import com.rest.api.repo.UserJpaRepo;
 import com.rest.api.repo.board.BoardJpaRepo;
 import com.rest.api.repo.board.PostJpaRepo;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -49,22 +51,22 @@ public class BoardService {
     }
 
     // 게시물을 등록합니다. 게시물의 회원UID가 조회되지 않으면 CUserNotFoundException 처리합니다.
-//    @CacheEvict(value = CacheKey.POSTS, key = "#boardName")
+    @CacheEvict(value = CacheKey.POSTS, key = "#boardName")
+    @ForbiddenWordCheck
     public Post writePost(String uid, String boardName, ParamsPost paramsPost) {
         Board board = findBoard(boardName);
-        checkForbiddenWord(paramsPost.getContent());
         Post post = new Post(userJpaRepo.findByUid(uid).orElseThrow(CUserNotFoundException::new), board, paramsPost.getAuthor(), paramsPost.getTitle(), paramsPost.getContent());
         return postJpaRepo.save(post);
     }
 
     // 게시물을 수정합니다. 게시물 등록자와 로그인 회원정보가 틀리면 CNotOwnerException 처리합니다.
     @CachePut(value = CacheKey.POST, key = "{#postId}")
+    @ForbiddenWordCheck
     public Post updatePost(long postId, String uid, ParamsPost paramsPost) {
         Post post = getPost(postId);
         User user = post.getUser();
         if (!uid.equals(user.getUid()))
             throw new CNotOwnerException();
-        checkForbiddenWord(paramsPost.getContent());
         //영속성 컨텍스트의 변경감지(dirty checking) 기능에 의해 조회한 Post내용을 변경만 해도 Update쿼리가 실행됩니다.
         post.setUpdate(paramsPost.getAuthor(), paramsPost.getTitle(), paramsPost.getContent());
         return post;
@@ -80,10 +82,10 @@ public class BoardService {
         return true;
     }
 
-    public void checkForbiddenWord(String word) {
-        List<String> forbiddenWords = Arrays.asList("fuck", "shit");
-        Optional<String> forbiddenWord = forbiddenWords.stream().filter(word::contains).findFirst();
-        if (forbiddenWord.isPresent())
-            throw new CForbiddenWordException(forbiddenWord.get());
-    }
+//    public void checkForbiddenWord(String word) {
+//        List<String> forbiddenWords = Arrays.asList("fuck", "shit");
+//        Optional<String> forbiddenWord = forbiddenWords.stream().filter(word::contains).findFirst();
+//        if (forbiddenWord.isPresent())
+//            throw new CForbiddenWordException(forbiddenWord.get());
+//    }
 }
