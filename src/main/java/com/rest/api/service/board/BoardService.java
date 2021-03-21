@@ -1,5 +1,6 @@
 package com.rest.api.service.board;
 
+import com.rest.api.advice.exception.CForbiddenWordException;
 import com.rest.api.advice.exception.CNotOwnerException;
 import com.rest.api.advice.exception.CResourceNotExistException;
 import com.rest.api.advice.exception.CUserNotFoundException;
@@ -17,6 +18,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,6 +37,7 @@ public class BoardService {
     public Board findBoard(String boardName) {
         return Optional.ofNullable(boardJpaRepo.findByName(boardName)).orElseThrow(CResourceNotExistException::new);
     }
+
     // 게시판 이름으로 게시물 리스트 조회.
     @Cacheable(value = CacheKey.POSTS, key = "#boardName", unless = "#result == null")
     public List<Post> findPosts(String boardName) {
@@ -44,13 +47,16 @@ public class BoardService {
     public Post getPost(long postId) {
         return postJpaRepo.findById(postId).orElseThrow(CResourceNotExistException::new);
     }
+
     // 게시물을 등록합니다. 게시물의 회원UID가 조회되지 않으면 CUserNotFoundException 처리합니다.
 //    @CacheEvict(value = CacheKey.POSTS, key = "#boardName")
     public Post writePost(String uid, String boardName, ParamsPost paramsPost) {
         Board board = findBoard(boardName);
+        checkForbiddenWord(paramsPost.getContent());
         Post post = new Post(userJpaRepo.findByUid(uid).orElseThrow(CUserNotFoundException::new), board, paramsPost.getAuthor(), paramsPost.getTitle(), paramsPost.getContent());
         return postJpaRepo.save(post);
     }
+
     // 게시물을 수정합니다. 게시물 등록자와 로그인 회원정보가 틀리면 CNotOwnerException 처리합니다.
     @CachePut(value = CacheKey.POST, key = "{#postId}")
     public Post updatePost(long postId, String uid, ParamsPost paramsPost) {
@@ -58,10 +64,12 @@ public class BoardService {
         User user = post.getUser();
         if (!uid.equals(user.getUid()))
             throw new CNotOwnerException();
+        checkForbiddenWord(paramsPost.getContent());
         //영속성 컨텍스트의 변경감지(dirty checking) 기능에 의해 조회한 Post내용을 변경만 해도 Update쿼리가 실행됩니다.
         post.setUpdate(paramsPost.getAuthor(), paramsPost.getTitle(), paramsPost.getContent());
         return post;
     }
+
     // 게시물을 삭제합니다. 게시물 등록자와 로그인 회원정보가 틀리면 CNotOwnerException 처리합니다.
     public boolean deletePost(long postId, String uid) {
         Post post = getPost(postId);
@@ -70,5 +78,12 @@ public class BoardService {
             throw new CNotOwnerException();
         postJpaRepo.delete(post);
         return true;
+    }
+
+    public void checkForbiddenWord(String word) {
+        List<String> forbiddenWords = Arrays.asList("fuck", "shit");
+        Optional<String> forbiddenWord = forbiddenWords.stream().filter(word::contains).findFirst();
+        if (forbiddenWord.isPresent())
+            throw new CForbiddenWordException(forbiddenWord.get());
     }
 }
