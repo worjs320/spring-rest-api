@@ -1,9 +1,6 @@
 package com.rest.api.service.board;
 
-import com.rest.api.advice.exception.CForbiddenWordException;
-import com.rest.api.advice.exception.CNotOwnerException;
-import com.rest.api.advice.exception.CResourceNotExistException;
-import com.rest.api.advice.exception.CUserNotFoundException;
+import com.rest.api.advice.exception.*;
 import com.rest.api.annotation.ForbiddenWordCheck;
 import com.rest.api.common.CacheKey;
 import com.rest.api.entity.User;
@@ -34,8 +31,18 @@ public class BoardService {
     private final PostJpaRepo postJpaRepo;
     private final UserJpaRepo userJpaRepo;
 
+    public Board writeBoard(String boardName) {
+        if(boardJpaRepo.findByName(boardName) != null) {
+            throw new CResourceExistException();
+        }
+        Board board = Board.builder()
+                .name(boardName)
+                .build();
+        return boardJpaRepo.save(board);
+    }
+
     // 게시판 이름으로 게시판을 조회. 없을경우 CResourceNotExistException 처리
-    @Cacheable(value = CacheKey.BOARD, key = "#boardName", unless = "result==null")
+    @Cacheable(value = CacheKey.BOARD, key = "#boardName", unless = "#result == null")
     public Board findBoard(String boardName) {
         return Optional.ofNullable(boardJpaRepo.findByName(boardName)).orElseThrow(CResourceNotExistException::new);
     }

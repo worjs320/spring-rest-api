@@ -1,5 +1,6 @@
 package com.rest.api.controller.v1.board;
 
+import com.rest.api.entity.User;
 import com.rest.api.entity.board.Board;
 import com.rest.api.entity.board.Post;
 import com.rest.api.model.CommonResult;
@@ -8,10 +9,7 @@ import com.rest.api.model.SingleResult;
 import com.rest.api.model.board.ParamsPost;
 import com.rest.api.service.ResponseService;
 import com.rest.api.service.board.BoardService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,6 +25,12 @@ public class BoardController {
 
     private final BoardService boardService;
     private final ResponseService responseService;
+
+    @ApiOperation(value = "게시판 저장", notes = "게시판을 저장한다")
+    @PostMapping(value = "/{boardName}")
+    public SingleResult<Board> saveBoard(@ApiParam(value = "게시판 이름", required = true) @RequestParam String name) {
+        return responseService.getSingleResult(boardService.writeBoard(name));
+    }
 
     @ApiOperation(value = "게시판 정보 조회", notes = "게시판 정보를 조회한다.")
     @GetMapping(value = "/{boardName}")
@@ -44,7 +48,7 @@ public class BoardController {
             @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = true, dataType = "String", paramType = "header")
     })
     @ApiOperation(value = "게시판 글 작성", notes = "게시판에 글을 작성한다.")
-    @PostMapping(value = "/{boardName}")
+    @PostMapping(value = "/post/{boardName}")
     public SingleResult<Post> post(@PathVariable String boardName, @Valid @ModelAttribute ParamsPost post) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();

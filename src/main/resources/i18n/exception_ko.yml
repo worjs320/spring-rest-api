@@ -29,3 +29,6 @@ resourceNotExist:
 forbiddenWord:
   code: "-1008"
   msg: "입력한 내용에 금칙어({0})가 포함되어 있습니다."
+resourceExist:
+  code: "-1009"
+  msg: "이미 존재하는 리소스 이름입니다."
